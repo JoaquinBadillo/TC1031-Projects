@@ -34,7 +34,7 @@ void inOrderTraversal(struct node* root);
 // Priority Queue Interface
 struct priority_queue* Priority_Queue();
 void deleteQueue(struct priority_queue** P);
-void enqueue(struct priority_queue* P, int key, int data);
+short enqueue(struct priority_queue* P, int key, int data);
 int dequeue(struct priority_queue* P);
 
 // Additonal Functions

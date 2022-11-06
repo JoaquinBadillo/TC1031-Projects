@@ -160,12 +160,14 @@ void deleteQueue(struct priority_queue** P) {
 }
 
 // Enqueue (with priority) -- Time Complexity: O(lg n)
-void enqueue(struct priority_queue* P, int key, int data) {
+short enqueue(struct priority_queue* P, int key, int data) {
     struct node* inserted = insertNode(&(P -> root), key, data);
     if (inserted) {
-        P -> size++; 
-        printf("Enqueued: (%i, %i)\n", key, data);
+        P -> size++;
+        return 1; 
     }
+    printf("Error: could not insert\n");
+    return 0;
 }
 
 // Dequeue (with priority) -- Time Complexity: O(lg n)
