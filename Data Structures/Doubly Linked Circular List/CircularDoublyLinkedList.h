@@ -22,15 +22,15 @@ Lista crearLista(){
 }
 
 //Funcion para verficar si la lista esta vacia
-int listaVacia(Lista lista){
-    int state = lista.inicio == NULL ? 1 : 0;
+int listaVacia(Lista *lista){
+    int state = lista->inicio == NULL ? 1 : 0;
     return state;
 }
 
-//Funcion para recoorer la lista circular doblemente enlazada
-void recorrerLista(Lista lista){
+//Funcion para recorrer la lista circular doblemente enlazada
+void recorrerLista(Lista *lista){
     int var = 0;
-    Nodo *temporal = lista.inicio;
+    Nodo *temporal = lista->inicio;
     do{
         printf("El elemento actual es: %d \n", temporal->valor);
         printf("Mostrar anterior presione [1]\n");
@@ -41,14 +41,14 @@ void recorrerLista(Lista lista){
 }
 
 //Funcion para imprimir la lista 
-void printLista(Lista lista){
-    int size = lista.size;
+void printLista(Lista *lista){
+    int size = lista->size;
     if(listaVacia(lista)){
         printf("La lista esta vacia\n");
         return;
     }else{
         printf("Elementos de la lista\n");
-        Nodo *actual = lista.inicio; 
+        Nodo *actual = lista->inicio; 
         while(size != 0){ //Recorremos la lista
             printf("%d\n", actual->valor);
             actual = actual->siguiente; //Avanzamos al siguiente nodo
@@ -67,7 +67,7 @@ void primerNodo(Lista *lista, int valor){
 
 //Funcion para insertar un elemento al final de la lista
 void insertarFinal(Lista *lista, int valor){ 
-    if(listaVacia(*lista)){
+    if(listaVacia(lista)){
         primerNodo(lista, valor);
     }else{
         Nodo *nuevoNodo, *temporal;
@@ -87,7 +87,7 @@ void insertarFinal(Lista *lista, int valor){
 
 //Funcion para insertar un elemento al inicio de la lista
 void insertarInicio(Lista *lista, int valor){
-    if(listaVacia(*lista)){
+    if(listaVacia(lista)){
         primerNodo(lista, valor);
     }else{
         Nodo *nuevoNodo, *temporal;
@@ -117,6 +117,7 @@ void borrarElemento(Lista *lista, int posicion){
         return;
     }else{
         Nodo *temporal = lista->inicio;
+        posicion = posicion % lista->size;
         for(int i = 0; i < posicion-1; ++i){
             temporal = temporal->siguiente;
         }
@@ -125,8 +126,8 @@ void borrarElemento(Lista *lista, int posicion){
             free(temporal);
             lista->size--;
     }
-    
 }
+
 
 //Funcion para borrar el ultimo elemento de la lista
 void borrarValor(Lista *lista, int cantidad){
@@ -178,9 +179,23 @@ void agregarMulti(Lista *lista){
     }while(var != 2);
 }
 
-//Funcion para borrar toda la lista
+//Funcion que arroja el tamaño de la lista
+int sizeLista(Lista *lista){
+    return lista->size;
+}
+
+//Funcion que eleva los elementos de la lista al cuadrado (Extra)
+void listaCuadrado(Lista *lista){
+    Nodo *temporal = lista->inicio;
+    do{
+        temporal->valor *= temporal->valor;
+        temporal = temporal->siguiente;
+    }while(temporal != lista->inicio);
+}
+
+//Funcion para borrar toda la lista 
 void borrarLista(Lista *lista){
-    if(listaVacia(*lista)){
+    if(listaVacia(lista)){
         printf("La lista esta vacia\n");
         return;
     }else{
