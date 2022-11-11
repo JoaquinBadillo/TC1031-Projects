@@ -166,18 +166,33 @@ void duplicarLista(Lista *lista){
 }
 
 //Funcion para agregar multiples elementos a la lista
-/*-----Editar para que el usuario pueda elegir la posicion-------*/
-void agregarMulti(Lista *lista){
-    int var = 0;
-    do{
-        int valor;
-        printf("Ingrese el valor del elemento: ");
-        scanf("%d", &valor);
-        insertarFinal(lista, valor);
-        printf("Desea agregar otro elemento? [1]Si [2]No: ");
-        scanf("%d", &var);
-    }while(var != 2);
+void agregarMulti(Lista *lista, int index, int num){
+    int pos = index % lista -> size; 
+    Nodo* temp = lista -> inicio;
+
+    if (temp) {
+        int i;
+
+        for (i = 0; i < pos; ++i)
+            temp = temp -> siguiente;
+
+        for (i = 0; i < num; ++i) {
+            int valor;
+            printf("Ingrese el valor del elemento: ");
+            scanf("%d", &valor);
+
+            // Añadir nodo
+            Nodo* nuevo = (Nodo*)malloc(sizeof(Nodo*));
+            nuevo -> anterior = temp;
+            nuevo -> siguiente = temp -> siguiente;
+            temp -> siguiente = nuevo;
+            temp = nuevo;
+        }
+    } else {
+        printf("Error: lista vacía\n");
+    }
 }
+
 
 //Funcion que arroja el tamaño de la lista
 int sizeLista(Lista *lista){
