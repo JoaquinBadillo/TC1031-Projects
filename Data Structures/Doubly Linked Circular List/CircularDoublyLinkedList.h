@@ -47,7 +47,7 @@ void printLista(Lista lista){
         printf("La lista esta vacia\n");
         return;
     }else{
-        printf("Elemenetos de la lista\n");
+        printf("Elementos de la lista\n");
         Nodo *actual = lista.inicio; 
         while(size != 0){ //Recorremos la lista
             printf("%d\n", actual->valor);
@@ -111,36 +111,46 @@ void insertarInicio(Lista *lista, int valor){
 
 
 //Funcion para borrar el primer elemento de la lista
-void borrarPrimero(Lista *lista){
-    if(listaVacia(*lista)){
-        printf("La lista esta vacia\n");
-        return;
-    }else{
-        Nodo *temporal = lista->inicio;
-        lista->inicio->anterior->siguiente = lista->inicio->siguiente;
-        lista->inicio->siguiente->anterior = lista->inicio->anterior;
-        lista->inicio = lista->inicio->siguiente;
-        free(temporal);
-    }
-}
-
-//Funcion para borrar el ultimo elemento de la lista
-void borrarUltimo(Lista *lista){
+void borrarElemento(Lista *lista, int posicion){
     if(lista->inicio == NULL){
         printf("La lista esta vacia\n");
         return;
     }else{
         Nodo *temporal = lista->inicio;
-        while(temporal->siguiente != lista->inicio){
+        for(int i = 0; i < posicion-1; ++i){
             temporal = temporal->siguiente;
         }
-        temporal->anterior->siguiente = temporal->siguiente;
-        temporal->siguiente->anterior = temporal->anterior;
-        free(temporal);
+            temporal->anterior->siguiente = temporal->siguiente;
+            temporal->siguiente->anterior = temporal->anterior;
+            free(temporal);
+            lista->size--;
     }
+    
 }
 
-//Funcion para duplicar la lista
+//Funcion para borrar el ultimo elemento de la lista
+void borrarValor(Lista *lista, int cantidad){
+    if(lista->inicio == NULL){
+        printf("La lista esta vacia\n");
+        return;
+    }else{
+        Nodo *temporal = lista->inicio;
+        while(temporal->siguiente != lista->inicio && temporal->valor != cantidad){
+            temporal = temporal->siguiente;
+        }
+        if (temporal->valor == cantidad){
+            temporal->anterior->siguiente = temporal->siguiente;
+            temporal->siguiente->anterior = temporal->anterior;
+            free(temporal);
+            lista->size--;
+        }
+        else
+            return;
+    }
+    
+}
+
+//Funcion para duplicar la lista (Extra)
 void duplicarLista(Lista *lista){
     int var = 0;
     Nodo *temporal = lista->inicio;
