@@ -249,3 +249,38 @@ void borrarLista(Lista *lista){
         lista->inicio = NULL;
     }
 }
+
+void borrarMulti(Lista *lista, int x) {
+    Nodo* current = lista -> inicio;
+    int i;
+    
+    for (i = 0; i < lista -> size; ++i){
+        if (current -> valor == x) {
+            Nodo* temp = current;
+            current = current -> siguiente;
+
+            temp -> anterior -> siguiente = temp -> siguiente;
+            temp -> siguiente -> anterior = temp -> anterior;
+            free(temp);
+            lista -> size--;
+
+            
+        } else {
+            current = current -> siguiente;
+        } 
+    }
+}
+
+int buscarValor(Lista* lista, int x) {
+    Nodo* current = lista -> inicio;
+    int i;
+
+    for (i = 0; i < lista -> size; ++i){
+        if (current -> valor == x)
+            return i;
+        
+        current = current -> siguiente;
+    }
+
+    return -1;
+}
