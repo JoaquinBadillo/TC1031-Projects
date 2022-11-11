@@ -12,6 +12,8 @@ int main(){
     printf("La lista al cuadrado es: \n");
     listaCuadrado(&miLista);
     printLista(&miLista);
+    insertarMedio(&miLista, 5);
+    printLista(&miLista);
 
     //HEMOS VUELTOOOOOOOOOO
     return 0;

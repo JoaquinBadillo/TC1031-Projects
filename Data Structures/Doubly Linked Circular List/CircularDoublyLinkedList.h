@@ -107,7 +107,25 @@ void insertarInicio(Lista *lista, int valor){
 }
 
 //Funcion para insertar un elemento en medio de la lista
-/*-------------------PENDIENTE---------------*/
+void insertarMedio(Lista *lista, int valor){ 
+    if(listaVacia(lista))
+        primerNodo(lista, valor);
+    else{
+        int length = lista->size / 2;
+        Nodo *nuevoNodo, *temporal;
+        temporal = lista->inicio;
+        nuevoNodo = (Nodo*)malloc(sizeof(Nodo));
+        for (int i = 0; i < length-1; i++)
+            temporal = temporal->siguiente;
+        nuevoNodo->valor = valor;
+        nuevoNodo->siguiente = temporal->siguiente;
+        nuevoNodo->anterior = temporal->anterior;
+        temporal->siguiente = nuevoNodo;
+    }
+    lista->size++; //Incrementamos el tamaño de la lista
+}
+
+
 
 
 //Funcion para borrar el primer elemento de la lista
