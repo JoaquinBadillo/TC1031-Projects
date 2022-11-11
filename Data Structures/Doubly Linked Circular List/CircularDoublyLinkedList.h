@@ -183,10 +183,18 @@ void agregarMulti(Lista *lista, int index, int num){
 
             // Añadir nodo
             Nodo* nuevo = (Nodo*)malloc(sizeof(Nodo*));
+
+            if (nuevo == NULL) {
+                printf("No hay memoria\n");
+                return;
+            }
+
             nuevo -> anterior = temp;
             nuevo -> siguiente = temp -> siguiente;
             temp -> siguiente = nuevo;
             temp = nuevo;
+
+            lista -> size++;
         }
     } else {
         printf("Error: lista vacía\n");
