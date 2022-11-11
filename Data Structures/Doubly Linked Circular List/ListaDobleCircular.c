@@ -18,6 +18,5 @@ int main(){
     printLista(&miLista);
     insertarMedio(&miLista, 5);
     printLista(&miLista);
-    //HEMOS VUELTOOOOOOOOOO
     return 0;
 }
