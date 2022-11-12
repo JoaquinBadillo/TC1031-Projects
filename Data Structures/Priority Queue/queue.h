@@ -5,6 +5,8 @@
 #ifndef QUEUE_H
 #define QUEUE_H
 
+// Nodes and queue definition
+
 typedef struct queueNode {
     int value;
     struct queueNode* next;

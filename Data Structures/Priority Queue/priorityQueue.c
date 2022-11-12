@@ -261,6 +261,7 @@ void printPQueue(struct priority_queue* P) {
     }
 }
 
+// Enqueue Consecutive Nodes -- Time Complexity: O(lg k + m)
 void enqueueMultiple(struct priority_queue* P, int key, int* data, int num) {
     node* prev = NIL;
 	node* current = P -> root;

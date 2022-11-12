@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "priorityQueue.h"
 
 void main(void) {
+    srand(time(NULL));
     struct priority_queue* P = Priority_Queue();
     int n;
 
