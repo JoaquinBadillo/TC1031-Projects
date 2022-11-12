@@ -25,7 +25,7 @@ The implementation of data structures was done with additional c files, to execu
 $ gcc main.c CircularDoublyLinkedList.c -o main
 ```
 
-**Doubly Linked Circular List**
+**Priority Queue**
 ```
 $ gcc main.c queue.c priorityQueue.c -o main
 ```
