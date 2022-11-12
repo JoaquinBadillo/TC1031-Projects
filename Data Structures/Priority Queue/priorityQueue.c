@@ -13,6 +13,9 @@
 
     The Red Black Tree follows H. Cormen, Charles E. Leiserson, Ronald L. Rivest & Clifford Stein
     Introduction to Algorithms' implementation.
+
+    It was modified to store queues, so that the insertion of multiple nodes is supported in O(lg n + m) time,
+    where n is the number of nodes previously stored in the tree and m is the number of nodes to insert.
 */
 
 // RED BLACK TREE INTERFACE
@@ -22,15 +25,16 @@ struct node nil_node = {.key = INT_MAX, .data = 0, .color = BLACK, .parent = &ni
 struct node* NIL = &nil_node;
 
 // Constructor -- Time Complexity: O(1)
-struct node* Node(int key, int data) { 
-    struct node* element;
-    element = malloc(sizeof(struct node));
+struct node* Node(int key, int value) { 
+    node* element;
+    element = malloc(sizeof(node));
 
     if (element == NULL)
         return NIL;
 
     element -> key = key;
-    element -> data = data;
+    element -> data = (queue*)malloc(sizeof(queue));
+    qEnqueue(element -> data, value);
     element -> color = RED;
 
     element -> left = NIL;
@@ -45,51 +49,70 @@ void deleteSubtree(struct node** root, struct node* element) {
     if (element != NIL) {
         deleteSubtree(root, element -> left);
         deleteSubtree(root, element -> right);
+
         if (element == *root) {
             *root = NIL;
         }
+
+        deleteQueue(element -> data);
+        free(element -> data);
+
         free(element);
     }
 }
 
-// Insertion -- Time Complexity: O(lg n)
-struct node* insertNode(struct node** root, int key, int data) {
-    struct node* element = Node(key, data);
+// Insertion -- Time Complexity: O(lg k)
+struct node* insertNode(struct node** root, int key, int value) {
+	node* prev = NIL;
+	node* current = *root;
 
-    if (element == NIL) {
-        printf("Error: No memory!\n");
-        return NULL;
-    }
-
-	struct node* prev = NIL;
-	struct node* current = *root;
+    short insertNewNode = 1;
 
 	while (current != NIL) {
 		prev = current;
 
-		if (element -> key < current -> key)
+		if (key < current -> key)
 			current = current -> left;
-		else
+		else if (key > current -> key)
 			current = current -> right;
+        else {
+            insertNewNode = 0;
+            break;
+        }
 	}
 
-	element -> parent = prev; 
+    if (insertNewNode) {
+        node* element = Node(key, value);
 
-	if(prev == NIL)
-		*root  = element;
-	else if (element -> key < prev -> key)
-		prev -> left = element;
-	else
-		prev -> right = element;
+        if (element == NIL) {
+            printf("Error: No memory!\n");
+            return NULL;
+        }
 
-	insertFixUp(root, element);
+        element -> parent = prev; 
 
-    return element;
+        if(prev == NIL)
+            *root  = element;
+        else if (element -> key < prev -> key)
+            prev -> left = element;
+        else
+            prev -> right = element;
+
+        insertFixUp(root, element);
+
+        return element;
+    } else {
+        qEnqueue(current -> data, value);
+        return current;
+    }
 }
 
-// Deletion -- Time Complexity: O(lg n)
+// Deletion -- Time Complexity: O(lg k)
 void deleteNode(struct node** root, struct node* z) {
-    struct node *x, *y;
+    if (!qIsEmpty(z -> data))
+        return;
+    
+    node *x, *y;
     y = z;
 
     char yColor = y -> color;
@@ -120,6 +143,7 @@ void deleteNode(struct node** root, struct node* z) {
         y -> color = z -> color;
     }
 
+    free(z -> data);
     free(z);
 
     if (yColor == BLACK)
@@ -129,9 +153,13 @@ void deleteNode(struct node** root, struct node* z) {
 // In Order Traversal -- Time Complexity: O(n)
 void inOrderTraversal(struct node* subtreeRoot) {
     if (subtreeRoot != NIL) {
-        inOrderTraversal(subtreeRoot -> right);
-        printf("-> (%i, %i) ", subtreeRoot -> key, subtreeRoot -> data);
         inOrderTraversal(subtreeRoot -> left);
+        
+        queueNode* it;
+        for (it = subtreeRoot -> data -> front; it != NULL; it = it -> next)
+            printf("(%i, %i) - ", subtreeRoot -> key, it ->value);
+
+        inOrderTraversal(subtreeRoot -> right);
     }
 }
 
@@ -139,7 +167,7 @@ void inOrderTraversal(struct node* subtreeRoot) {
 
 // Constructor -- Time Complexity: O(1)
 struct priority_queue* Priority_Queue() {
-    struct priority_queue* P;
+    priority_queue* P;
     P = malloc(sizeof(struct priority_queue));
 
     if (P == NULL) {
@@ -153,15 +181,17 @@ struct priority_queue* Priority_Queue() {
 }
 
 // Destructor -- Time Complexity: O(n)
-void deleteQueue(struct priority_queue** P) {
+void deletePQueue(struct priority_queue** P) {
     deleteSubtree(&(P[0] -> root), P[0] -> root);
     free(*P);
     *P = NULL;
+
+    printf("\nPriority queue deleted: Your RAM is safe\n");
 }
 
-// Enqueue (with priority) -- Time Complexity: O(lg n)
+// Enqueue (with priority) -- Time Complexity: O(lg k)
 short enqueue(struct priority_queue* P, int key, int data) {
-    struct node* inserted = insertNode(&(P -> root), key, data);
+    node* inserted = insertNode(&(P -> root), key, data);
     if (inserted) {
         P -> size++;
         return 1; 
@@ -170,38 +200,43 @@ short enqueue(struct priority_queue* P, int key, int data) {
     return 0;
 }
 
-// Dequeue (with priority) -- Time Complexity: O(lg n)
+// Dequeue (with priority) -- Time Complexity: O(lg k)
 int dequeue(struct priority_queue* P) {
     if (isEmpty(P)) {
         printf("Queue is empty!\n");
         return -1;
     }
 
-    struct node* x = minimum(P -> root);
+    node* x = minimum(P -> root);
     int priority = x -> key;
-    int value = x -> data;
-    deleteNode(&(P -> root), x);
+    int value = qDequeue(x -> data);
+
+    if (qIsEmpty(x -> data))
+        deleteNode(&(P -> root), x);
+    
     P -> size--;
     printf("Dequeued: (%i, %i)\n", priority, value);
     return value;
 }
 
-// Find node -- Time Complexity: O(lg n)
-struct node* findNode(struct priority_queue* P, int key, int data) {
-    struct node* current = P -> root;
+// Find node -- Time Complexity: O(m lg k)
+struct queueNode* findNode(struct priority_queue* P, int key, int data) {
+    node* current = P -> root;
 
     while (P -> root != NIL) {
         if (current -> key < key)
             current = current -> left;
         else if (current -> key > key)
             current = current -> right;
-        else if (current -> data != data)
-            current = current -> right;
-        else
-            return current;
+        else {
+            queueNode* found = findQueueNode(current -> data, data);
+            if (found)
+                return found;
+            else 
+                break;
+        }
     }
 
-    printf("Node not found\n");
     return NULL;
 }
 
@@ -220,16 +255,67 @@ void printPQueue(struct priority_queue* P) {
     if (isEmpty(P))
         printf("Queue is empty\n");
     else {
-        printf("[BACK] ");
+        printf("[FRONT] ");
         inOrderTraversal(P -> root);
-        printf("[FRONT]\n");
+        printf("[BACK]\n");
+    }
+}
+
+void enqueueMultiple(struct priority_queue* P, int key, int* data, int num) {
+    node* prev = NIL;
+	node* current = P -> root;
+
+    short insertNewNode = 1;
+
+	while (current != NIL) {
+		prev = current;
+
+		if (key < current -> key)
+			current = current -> left;
+		else if (key > current -> key)
+			current = current -> right;
+        else {
+            insertNewNode = 0;
+            break;
+        }
+	}
+
+    if (insertNewNode) {
+        node* element = Node(key, data[0]);
+
+        if (element == NIL) {
+            printf("Error: No memory!\n");
+            return;
+        }
+
+        element -> parent = prev; 
+
+        if(prev == NIL)
+            P -> root  = element;
+        else if (element -> key < prev -> key)
+            prev -> left = element;
+        else
+            prev -> right = element;
+
+        insertFixUp(&(P -> root), element);
+
+        current = element;
+        P -> size++;
+
+        printf("Enqueued: (%i, %i)\n", key, data[0]);
+    }
+
+    for (int i = insertNewNode; i < num; ++i) {
+        qEnqueue(current -> data, data[i]);
+        P -> size++;
+        printf("Enqueued: (%i, %i)\n", key, data[i]);
     }
 }
 
 // HELPER FUNCTIONS
 
 void leftRotate(struct node** root, struct node* x) {
-    struct node* y = x -> right;				
+    node* y = x -> right;				
 	x -> right = y -> left;
 
 	if (y -> left != NIL)
@@ -249,7 +335,7 @@ void leftRotate(struct node** root, struct node* x) {
 }
 
 void rightRotate(struct node** root, struct node* y) {
-    struct node* x = y -> left;
+    node* x = y -> left;
 	y -> left = x -> right;
 
 	if(x -> right != NIL)
@@ -270,7 +356,7 @@ void rightRotate(struct node** root, struct node* y) {
 }
 
 void insertFixUp(struct node** root, struct node* z) {
-    struct node* temp;
+    node* temp;
     int counter = 0;
     while (z -> parent -> color == RED) {
         if (z -> parent == z -> parent -> parent -> left) {
@@ -323,7 +409,7 @@ void deleteFixUp(struct node** root, struct node* x) {
     while ((x != *root) && (x -> color == BLACK)) {
 
         if (x == x -> parent -> left) {
-            struct node* w = x -> parent -> right;
+            node* w = x -> parent -> right;
 
             if (w -> color == RED) {
                 w -> color = BLACK;
@@ -353,7 +439,7 @@ void deleteFixUp(struct node** root, struct node* x) {
         } else {
 
             if (x == x -> parent -> right) {
-                struct node* w = x -> parent -> left;
+                node* w = x -> parent -> left;
 
                 if (w -> color == RED) {
                     w -> color = BLACK;
@@ -399,7 +485,7 @@ void transplant(struct node** root, struct node* u, struct node* v) {
 }
 
 struct node* minimum(struct node* T) {
-    struct node* temp = T;
+    node* temp = T;
 
     while (temp -> left != NIL) {
         temp = temp -> left;
@@ -409,7 +495,7 @@ struct node* minimum(struct node* T) {
 }
 
 struct node* maximum(struct node* T) {
-    struct node* temp = T;
+    node* temp = T;
 
     while (temp -> right != NIL) {
         temp = temp -> right;

@@ -8,10 +8,12 @@
 #define RED 'R'
 #define BLACK 'B'
 
+#include "queue.h"
+
 // Nodes and Queue definition
 typedef struct node {
     int key; // Priority
-    int data; // Value
+    queue* data; // Values
 
     char color;
     struct node* parent;
@@ -33,15 +35,16 @@ void inOrderTraversal(struct node* root);
 
 // Priority Queue Interface
 struct priority_queue* Priority_Queue();
-void deleteQueue(struct priority_queue** P);
+void deletePQueue(struct priority_queue** P);
 short enqueue(struct priority_queue* P, int key, int data);
 int dequeue(struct priority_queue* P);
 
 // Additonal Functions
-struct node* findNode(struct priority_queue* P, int key, int data);
+struct queueNode* findNode(struct priority_queue* P, int key, int data);
 short isEmpty(struct priority_queue* P);
 int size(struct priority_queue* P);
 void printPQueue(struct priority_queue* P);
+void enqueueMultiple(struct priority_queue* P, int key, int* data, int num);
 
 // Helper Functions
 void leftRotate(struct node** tree, struct node* x); 
