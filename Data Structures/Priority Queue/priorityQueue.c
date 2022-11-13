@@ -224,9 +224,9 @@ struct queueNode* findNode(struct priority_queue* P, int key, int data) {
     node* current = P -> root;
 
     while (P -> root != NIL) {
-        if (current -> key < key)
+        if (current -> key > key)
             current = current -> left;
-        else if (current -> key > key)
+        else if (current -> key < key)
             current = current -> right;
         else {
             queueNode* found = findQueueNode(current -> data, data);
